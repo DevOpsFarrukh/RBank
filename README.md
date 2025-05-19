@@ -1,4 +1,4 @@
-# RBank
+<!-- # RBank
 Testing workflow
 
 
@@ -60,3 +60,94 @@ jobs:
         run: |
           echo "Running Corp4 logic because Dev wasn't successful or hasn't run yet."
           # Add your actual logic here -->
+
+ #  ##############################
+<!-- name: CICD orchestrator
+
+on:
+  workflow_dispatch:
+
+jobs:
+  dev:
+    name: Baking Build for Dev
+    environment:
+      name: dev
+    runs-on: ubuntu-latest
+    steps:
+      - name: Try to Download Corp4 Status
+        uses: actions/download-artifact@v4
+        with:
+          name: corp4-status
+        continue-on-error: true
+
+      - name: Check Corp4 Result
+        id: check_corp4
+        run: |
+          if [[ -f corp4_status.txt ]] && [[ "$(cat corp4_status.txt)" == "success" ]]; then
+            echo "CORP4 already succeeded. Exiting DEV job early."
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "CORP4 not complete or failed. Proceeding with DEV logic."
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Exit Early Because Corp4 Was Successful
+        if: steps.check_corp4.outputs.skip == 'true'
+        run: |
+          echo "Skipping DEV logic because CORP4 was already successful."
+          exit 0
+
+      - name: Run Dev Logic
+        if: steps.check_corp4.outputs.skip == 'false'
+        run: echo "Running Dev Logic"
+
+      - name: Write Success Status
+        run: echo "success" > dev_status.txt
+
+      - name: Upload Dev Status
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev-status
+          path: dev_status.txt
+
+  corp4:
+    name: Baking Build for Corp4
+    environment:
+      name: corp4
+    runs-on: ubuntu-latest
+    steps:
+      - name: Try to Download Dev Status
+        uses: actions/download-artifact@v4
+        with:
+          name: dev-status
+        continue-on-error: true
+
+      - name: Check Dev Result
+        id: check_dev
+        run: |
+          if [[ -f dev_status.txt ]] && [[ "$(cat dev_status.txt)" == "success" ]]; then
+            echo "DEV already succeeded. Exiting CORP4 job early."
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "DEV not complete or failed. Proceeding with CORP4 logic."
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Exit Early Because Dev Was Successful
+        if: steps.check_dev.outputs.skip == 'true'
+        run: |
+          echo "Skipping CORP4 logic because DEV was already successful."
+          exit 0
+
+      - name: Run Corp4 Logic
+        if: steps.check_dev.outputs.skip == 'false'
+        run: echo "Running Corp4 Logic"
+
+      - name: Write Success Status
+        run: echo "success" > corp4_status.txt
+
+      - name: Upload Corp4 Status
+        uses: actions/upload-artifact@v4
+        with:
+          name: corp4-status
+          path: corp4_status.txt --> -->
