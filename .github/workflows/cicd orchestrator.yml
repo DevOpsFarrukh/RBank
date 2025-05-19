@@ -1,0 +1,44 @@
+name: CICD orchestrator 
+
+on:
+  workflow_dispatch:
+
+jobs:
+  dev:
+    name: Baking Build for Dev
+    environment:
+      name: dev
+    
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print Dev Message
+        run: echo "This is the DEV environment"
+
+  corp4:
+    name: Baking Build for Corp4
+    environment:
+      name: corp4
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print Corp4 Message 
+        run: echo "This is the CORP4 environment"
+
+  corp6:
+    name: Baking Build for Corp6
+    environment:
+      name: corp6
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print Corp6 Message 
+        run: echo "This is the CORP4 environment"
+
+  sit1:
+    name: Baking Build for SIT1
+    environment:
+      name: sit1
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print SIT1 Message
+        run: echo "This is the SIT1 environment"
