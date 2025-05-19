@@ -1,2 +1,62 @@
 # RBank
 Testing workflow
+
+
+<!-- name: CICD orchestrator
+
+on:
+  workflow_dispatch:
+
+jobs:
+  dev:
+    name: Baking Build for Dev
+    environment:
+      name: dev
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Dev Logic
+        run: echo "Running Dev Logic"
+
+      - name: Write Success Status
+        run: echo "success" > dev_status.txt
+
+      - name: Upload Dev Status
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev-status
+          path: dev_status.txt
+
+  corp4:
+    name: Baking Build for Corp4
+    environment:
+      name: corp4
+    runs-on: ubuntu-latest
+    steps:
+      - name: Try to Download Dev Status
+        uses: actions/download-artifact@v4
+        with:
+          name: dev-status
+        continue-on-error: true
+
+      - name: Check Dev Result
+        id: check_dev
+        run: |
+          if [[ -f dev_status.txt ]] && [[ "$(cat dev_status.txt)" == "success" ]]; then
+            echo "Dev was successful."
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "Dev result not available or failed. Running logic."
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Exit Early Because Dev Was Successful
+        if: steps.check_dev.outputs.skip == 'true'
+        run: |
+          echo "Dev succeeded. Skipping Corp4 logic."
+          exit 0
+
+      - name: Run Actual Corp4 Logic
+        if: steps.check_dev.outputs.skip == 'false'
+        run: |
+          echo "Running Corp4 logic because Dev wasn't successful or hasn't run yet."
+          # Add your actual logic here -->
