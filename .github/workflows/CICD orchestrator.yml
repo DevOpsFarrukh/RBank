@@ -1,35 +1,83 @@
-name: CICD orchestrator
+name: CICD Orchestrator
 
 on:
   workflow_dispatch:
 
 jobs:
   dev:
-    if: failure()
     name: Baking Build for Dev
     environment:
       name: dev
     runs-on: ubuntu-latest
     steps:
-      - name: Try to Download Corp4 and SIT1 Status
+      - name: Download Corp4 Status
+        uses: actions/download-artifact@v4
+        with:
+          name: corp4-status
         continue-on-error: true
-        run: |
-          
-          echo "This is dev job
-        shell: bash
 
-        
-        
+      - name: Check if Corp4 Was Approved First
+        id: check_corp4
+        run: |
+          if [[ -f corp4_status.txt ]] && [[ "$(cat corp4_status.txt)" == "success" ]]; then
+            echo "❌ Corp4 was approved and completed first. Exiting with failure."
+            exit 1
+          else
+            echo "✅ Corp4 was not approved. Proceeding with Dev logic."
+          fi
+
+      - name: Actual Dev Logic
+        if: success()
+        run: |
+          echo "🏗 Running Dev logic..."
+          echo "success" > dev_status.txt
+
+      - name: Upload Dev Status
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev-status
+          path: dev_status.txt
+
+      - name: Log Corp4 Already Approved
+        if: failure()
+        run: echo "💡 Skipped Dev because Corp4 already succeeded"
+
   corp4:
     name: Baking Build for Corp4
     environment:
       name: corp4
     runs-on: ubuntu-latest
-    if: always()
-    needs: [dev]
     steps:
-      - name: Try to Download Dev and SIT1 Status
+      - name: Download Dev Status
+        uses: actions/download-artifact@v4
+        with:
+          name: dev-status
         continue-on-error: true
-        run: echo "Trying to download dev-status and sit1-status if they exist"
-        shell: bash
- 
+
+      - name: Check if Dev Was Approved First
+        id: check_dev
+        run: |
+          if [[ -f dev_status.txt ]] && [[ "$(cat dev_status.txt)" == "success" ]]; then
+            echo "❌ Dev was approved and completed first. Exiting with failure."
+            exit 1
+          else
+            echo "✅ Dev was not approved. Proceeding with Corp4 logic."
+          fi
+
+      - name: Actual Corp4 Logic
+        if: success()
+        run: |
+          echo "🏗 Running Corp4 logic..."
+          echo "success" > corp4_status.txt
+
+      - name: Upload Corp4 Status
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: corp4-status
+          path: corp4_status.txt
+
+      - name: Log Dev Already Approved
+        if: failure()
+        run: echo "💡 Skipped Corp4 because Dev already succeeded"
