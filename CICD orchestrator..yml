@@ -3,10 +3,6 @@ name: CICD orchestrator
 on:
   workflow_dispatch:
 
-############################
-# Skipping job with artifact logic
-############################
-
 jobs:
   dev:
     if: failure()
@@ -21,21 +17,6 @@ jobs:
           
           echo "This is dev job
         shell: bash
-
-#   corp6:
-#     name: Baking Build for Dev
-#     environment:
-#       name: corp6
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Try to Download Corp4 and SIT1 Status
-#         continue-on-error: true
-#         run: |
-          
-#           echo "This is corp6 job
-#         shell: bash
-
-
         
   corp4:
     name: Baking Build for Corp4
@@ -49,9 +30,4 @@ jobs:
         continue-on-error: true
         run: echo "Trying to download dev-status and sit1-status if they exist"
         shell: bash
-
-
-   
-  
  
-
