@@ -21,9 +21,10 @@ jobs:
         run: |
           if [[ -f corp4_status.txt ]] && [[ "$(cat corp4_status.txt)" == "success" ]]; then
             echo "❌ Corp4 was approved and completed first. Exiting with failure."
-            exit 1
+            if: failure()
           else
             echo "✅ Corp4 was not approved. Proceeding with Dev logic."
+            exit 0
           fi
 
       - name: Actual Dev Logic
