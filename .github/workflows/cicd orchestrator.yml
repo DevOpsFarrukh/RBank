@@ -21,18 +21,18 @@ jobs:
           echo "This is dev job
         shell: bash
 
-  corp6:
-    name: Baking Build for Dev
-    environment:
-      name: corp6
-    runs-on: ubuntu-latest
-    steps:
-      - name: Try to Download Corp4 and SIT1 Status
-        continue-on-error: true
-        run: |
+#   corp6:
+#     name: Baking Build for Dev
+#     environment:
+#       name: corp6
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Try to Download Corp4 and SIT1 Status
+#         continue-on-error: true
+#         run: |
           
-          echo "This is corp6 job
-        shell: bash
+#           echo "This is corp6 job
+#         shell: bash
 
 
         
@@ -42,7 +42,7 @@ jobs:
       name: corp4
     runs-on: ubuntu-latest
     if: always()
-    needs: [dev, corp6]
+    needs: [dev]
     steps:
       - name: Try to Download Dev and SIT1 Status
         continue-on-error: true
