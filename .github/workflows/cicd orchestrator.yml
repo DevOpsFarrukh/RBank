@@ -24,7 +24,7 @@ jobs:
   corp6:
     name: Baking Build for Dev
     environment:
-      name: dev
+      name: corp6
     runs-on: ubuntu-latest
     steps:
       - name: Try to Download Corp4 and SIT1 Status
