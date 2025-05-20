@@ -9,6 +9,7 @@ on:
 
 jobs:
   dev:
+    if: failure()
     name: Baking Build for Dev
     environment:
       name: dev
